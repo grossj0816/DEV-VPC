@@ -1,0 +1,13 @@
+name: destroy-dev-vpc
+
+on: [workflow_dispatch]
+
+jobs:
+    build:
+        runs-on: unbuntu-latest
+
+        steps:
+            # Check out repo
+            # Configure AWS Credentials
+            # Setup Terraform
+            # Destroy Infrastructure
