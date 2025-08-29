@@ -7,7 +7,30 @@ jobs:
         runs-on: unbuntu-latest
 
         steps:
-            # Check out repo
-            # Configure AWS Credentials
-            # Setup Terraform
-            # Destroy Infrastructure
+          # Check out repo
+          - name: Git Checkout
+            uses: actions/checkout@v4
+
+          # Configure AWS Credentials
+          - name: Configure AWS Credentials
+            uses: aws-actions/configure-aws-credentials@v4
+            with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws-region: ${{ vars.AWS_REGION }}
+
+          # Setup Terraform
+          - name: Setup Terraform
+           uses: hashicorp/setup-terraform@v3
+           
+         # Destroy Terraform
+          - name: Destroy Terraform
+            working-directory: ./terraform
+            run: |
+              export TF_VAR_username=${{ secrets.AWS_RDS_USERNAME }}
+              export TF_VAR_password=${{ secrets.AWS_RDS_PASSSWORD }}
+              rm -fr terraform.tfstate || echo 'Does not exist'
+              terraform init -input=flase
+              terraform workspace new ${GITHUB_REF##*/} || echo 'Already exists'
+              terraform workspace select ${GITHUB_REF##*/} && terraform destroy -input=false -auto-approve
+          
