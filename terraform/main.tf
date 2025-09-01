@@ -124,7 +124,7 @@ resource "aws_route_table_association" "public_assoc" {
 resource "aws_route_table_association" "lambda_assoc" {
   count          = length(var.lambda_subnet_cidrs)
   subnet_id      = element(aws_subnet.lambda_subnet.*.id, count.index)
-  route_table_id = aws_route_table.public_table.id
+  route_table_id = aws_route_table.private_table.id
 }
 
 resource "aws_route_table_association" "database_assoc" {
