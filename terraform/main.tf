@@ -178,7 +178,7 @@ resource "aws_security_group" "db_sg" {
 }
 
 # DB Subnet Group
-# DBSNG ----------------------------------------------
+# DB SNG ----------------------------------------------
 resource "aws_db_subnet_group" "test_db_subnet_group" {
   name = "test_db_subnet_group"
   description = "DEV VPC DB Subnet Group"
