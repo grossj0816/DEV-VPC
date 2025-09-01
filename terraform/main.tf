@@ -43,9 +43,9 @@ resource "aws_subnet" "public_subnet" {
 
 # LAMBDA SUBNETS
 resource "aws_subnet" "lambda_subnet" {
-  count = length(var.lambda_subnet_cidrs)
-  vpc_id = aws_vpc.DEV-VPC.id
-  cidr_block = element(var.lambda_subnet_cidrs, count.index)
+  count             = length(var.lambda_subnet_cidrs)
+  vpc_id            = aws_vpc.DEV-VPC.id
+  cidr_block        = element(var.lambda_subnet_cidrs, count.index)
   availability_zone = element(var.azs, count.index)
   tags = {
     Name = "Lambda Subnet ${count.index + 1}"
@@ -54,9 +54,9 @@ resource "aws_subnet" "lambda_subnet" {
 
 # DATABASE SUBNETS
 resource "aws_subnet" "test_db_01_subnet" {
-  count = length(var.database_subnet_cidrs)
-  vpc_id = aws_vpc.DEV-VPC.id
-  cidr_block = element(var.database_subnet_cidrs, count.index)
+  count             = length(var.database_subnet_cidrs)
+  vpc_id            = aws_vpc.DEV-VPC.id
+  cidr_block        = element(var.database_subnet_cidrs, count.index)
   availability_zone = element(var.azs, count.index)
 
   tags = {
@@ -75,15 +75,15 @@ resource "aws_internet_gateway" "igw" {
 
 # ELASTIC IP ADDRESS
 resource "aws_eip" "nat_eip" {
-  domain = "vpc"
-  depends_on = [ aws_internet_gateway.igw ]
+  domain     = "vpc"
+  depends_on = [aws_internet_gateway.igw]
 }
 
 # NAT Gateway
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat_eip.id
-  subnet_id = element(aws_subnet.public_subnet.*.id, 0)
-  depends_on = [aws_internet_gateway.igw]
+  subnet_id     = element(aws_subnet.public_subnet.*.id, 0)
+  depends_on    = [aws_internet_gateway.igw]
   tags = {
     Name = "DEV VPC NAT Gateway"
   }
@@ -102,51 +102,51 @@ resource "aws_route_table" "private_table" {
 
 # ROUTES ------------------------------------------------
 resource "aws_route" "public_route" {
-  route_table_id = aws_route_table.public_table.id
+  route_table_id         = aws_route_table.public_table.id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id = aws_internet_gateway.igw.id
+  gateway_id             = aws_internet_gateway.igw.id
 }
 
 resource "aws_route" "private_route" {
-  route_table_id = aws_route_table.private_table.id
+  route_table_id         = aws_route_table.private_table.id
   destination_cidr_block = "0.0.0.0/0"
-   nat_gateway_id = aws_nat_gateway.nat.id
+  nat_gateway_id         = aws_nat_gateway.nat.id
 }
 
 # Route Table Associations
 # RTA --------------------------------------------------
 resource "aws_route_table_association" "public_assoc" {
-  count = length(var.public_subnet_cidrs)
-  subnet_id = element(aws_subnet.public_subnet.*.id, count.index)
+  count          = length(var.public_subnet_cidrs)
+  subnet_id      = element(aws_subnet.public_subnet.*.id, count.index)
   route_table_id = aws_route_table.public_table.id
 }
 
 resource "aws_route_table_associaion" "lambda_assoc" {
-  count = length(var.lambda_subnet_cidrs)
-  subnet_id = element(aws_subnet.lambda_subnet.*.id, count.index)
+  count          = length(var.lambda_subnet_cidrs)
+  subnet_id      = element(aws_subnet.lambda_subnet.*.id, count.index)
   route_table_id = aws_route_table.public_table.id
 }
 
 resource "aws_route_table_association" "database_assoc" {
-  count = length(var.database_subnet_cidrs)
-  subnet_id = element(aws_subnet.test_db_01_subnet.*.id, count.index)
+  count          = length(var.database_subnet_cidrs)
+  subnet_id      = element(aws_subnet.test_db_01_subnet.*.id, count.index)
   route_table_id = aws_route_table.private_table.id
 }
 
 # Security Groups
 # SGS ------------------------------------------------
 resource "aws_security_group" "lambda_sg" {
-  name = "dev_vpc_lambda_sg"
+  name        = "dev_vpc_lambda_sg"
   description = "Security group for lambdas made for use by DEV VPC resources."
-  vpc_id = aws_vpc.DEV-VPC.id
+  vpc_id      = aws_vpc.DEV-VPC.id
 
   dynamic "egress" {
     iterator = cidr
     for_each = var.database_subnet_cidrs
     content {
-      from_port = 3306
-      to_port = 3306
-      protocol = "tcp"
+      from_port   = 3306
+      to_port     = 3306
+      protocol    = "tcp"
       cidr_blocks = [cidr.value]
     }
   }
@@ -157,17 +157,17 @@ resource "aws_security_group" "lambda_sg" {
 }
 
 resource "aws_security_group" "db_sg" {
-  name = "dev_vpc_db_sg"
+  name        = "dev_vpc_db_sg"
   description = "Security group for DEV VPC"
-  vpc_id = aws_vpc.DEV-VPC.id
+  vpc_id      = aws_vpc.DEV-VPC.id
 
   dynamic "egress" {
     iterator = cidr
     for_each = var.database_subnet_cidrs
     content {
-      from_port = 3306
-      to_port = 3306
-      protocol = "tcp"
+      from_port   = 3306
+      to_port     = 3306
+      protocol    = "tcp"
       cidr_blocks = [cidr.value]
     }
   }
@@ -180,7 +180,7 @@ resource "aws_security_group" "db_sg" {
 # DB Subnet Group
 # DB SNG ----------------------------------------------
 resource "aws_db_subnet_group" "test_db_subnet_group" {
-  name = "test_db_subnet_group"
+  name        = "test_db_subnet_group"
   description = "DEV VPC DB Subnet Group"
 
   subnet_ids = [for subnet in aws_subnet.test_db_01_subnet : subnet.id]
