@@ -27,8 +27,12 @@ jobs:
           - name: Deploy Terraform
             working-directory: ./terraform
             run: |
-                export TF_VAR_USERNAME=${{ secrets.AWS_RDS_USERNAME }}
-                export TF_VARS_PASSWORD=${{ secrets.AWS_RDS_PASSSWORD }}
+                export TF_VAR_username=${{ secrets.AWS_RDS_USERNAME }}
+                export TF_VAR_password=${{ secrets.AWS_RDS_PASSSWORD }}
+                export TF_VAR_public_subnet_cidrs=${{ vars.PUBLIC_SUBNET_CIDRS }}
+                export TF_VAR_lambda_subnet_cidrs=${{ vars.LAMBDA_SUBNET_CIDRS }}
+                export TF_VAR_database_subnet_cidrs=${{ vars.DATABASE_SUBNET_CIDRS }}
+                export TF_VAR_azs=${{ vars.AZS }}
                 rm -fr terraform.tfstate || echo 'Does not exist'
                 terraform init -input=false -lock=false
                 terraform workspace new ${GITHUB_REF##*/} || echo 'Already exists'
