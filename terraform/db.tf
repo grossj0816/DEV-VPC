@@ -2,7 +2,7 @@ resource "aws_db_instance" "test_db_01" {
   allocated_storage      = 20
   db_name                = "dev-db-016"
   engine                 = "mysql"
-  engine_version         = "8.0.32"
+  engine_version         = "8.4.6"
   instance_class         = "db.t3.micro"
   username               = var.username
   password               = var.password
