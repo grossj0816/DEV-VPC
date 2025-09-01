@@ -1,4 +1,4 @@
-resource "aws_db_instance" "test_db_01" {
+resource "aws_db_instance" "rds_dev_instance" {
   allocated_storage      = 20
   db_name                = "dev-db-016"
   engine                 = "mysql"
