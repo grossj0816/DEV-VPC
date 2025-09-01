@@ -37,7 +37,7 @@ resource "aws_subnet" "public_subnet" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "DEV VPC"
+    Name = "Public Subnet ${count.index + 1}"
   }
 }
 
