@@ -1,6 +1,6 @@
 resource "aws_db_instance" "rds_dev_instance" {
   allocated_storage      = 20
-  db_name                = "dev-db-016"
+  db_name                = "rds_dev_instance"
   engine                 = "mysql"
   engine_version         = "8.4.6"
   instance_class         = "db.t3.micro"
