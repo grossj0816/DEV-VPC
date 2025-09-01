@@ -1,14 +1,14 @@
 resource "aws_db_instance" "test_db_01" {
   allocated_storage      = 20
-  db_name                = ""
-  engine                 = ""
-  engine_version         = ""
-  instance_class         = ""
-  username               = ""
-  password               = ""
+  db_name                = "dev-db-016"
+  engine                 = "mysql"
+  engine_version         = "8.0.32"
+  instance_class         = "db.t3.micro"
+  username               = var.username
+  password               = var.password
   skip_final_snapshot    = true
-  db_subnet_group_name   = ""
-  vpc_security_group_ids = []
+  db_subnet_group_name   = aws_db_subnet_group.test_db_subnet_group.id
+  vpc_security_group_ids = [aws_security_group.db_sg.id]
   publicly_accessible    = false
   apply_immediately      = true
 }
