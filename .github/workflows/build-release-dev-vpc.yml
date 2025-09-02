@@ -29,6 +29,7 @@ jobs:
             run: |
                 export TF_VAR_username=${{ secrets.AWS_RDS_USERNAME }}
                 export TF_VAR_password=${{ secrets.AWS_RDS_PASSSWORD }}
+                terraform force-unlock -force be2a85e2-098a-3abf-518d-0ff546e809e2
                 rm -fr terraform.tfstate || echo 'Does not exist'
                 terraform init -input=false -lock=false
                 terraform workspace new ${GITHUB_REF##*/} || echo 'Already exists'
